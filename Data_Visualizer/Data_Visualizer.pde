@@ -4,7 +4,7 @@ import java.io.PrintWriter; // Import library for writing to file
 Serial myPort;            // Serial port object
 PrintWriter output;       // File writer object
 
-float[][] dataPoints;     // 2D array to store data points (x, y, z, intensity, heading)
+float[][] dataPoints;     // 2D array to store data points (x, y, z, intensity, heading, inclination)
 int maxDataPoints = 100;  // Number of points to display on the chart
 float maxValue = 100.0;   // Maximum value for the chart scale (adjust as needed)
 String[] serialPorts;     // List of available COM ports
@@ -21,11 +21,11 @@ void setup() {
   }
   println("Please type the port number in the console to select it.");
 
-  dataPoints = new float[maxDataPoints][5]; // Initialize the 2D array
+  dataPoints = new float[maxDataPoints][6]; // Initialize the 2D array
 
   // Initialize file for recording data
   output = createWriter("data_log.csv");
-  output.println("X,Y,Z,Intensity,Heading"); // Add header row to the CSV
+  output.println("X,Y,Z,Intensity,Heading,Inclination"); // Add header row to the CSV
 }
 
 void draw() {
@@ -50,13 +50,14 @@ void draw() {
   textAlign(LEFT);
   text("Value", 10, height / 2);
 
-  // Draw data points for intensity
+  // Draw data points for intensity only
   float xStep = (width - 100) / (maxDataPoints - 1); // Spacing between points
   for (int i = 0; i < maxDataPoints - 1; i++) {
     float x1 = 50 + i * xStep;
     float y1 = map(dataPoints[i][3], 0, maxValue, height - 50, 50); // Intensity
     float x2 = 50 + (i + 1) * xStep;
     float y2 = map(dataPoints[i + 1][3], 0, maxValue, height - 50, 50); // Intensity
+    stroke(0, 0, 255); // Blue for intensity
     line(x1, y1, x2, y2); // Draw line between points
   }
 }
@@ -66,14 +67,15 @@ void serialEvent(Serial myPort) {
   if (data != null) {
     data = trim(data); // Remove extra whitespace
     try {
-      // Parse the CSV data (x, y, z, intensity, heading)
+      // Parse the CSV data (x, y, z, intensity, heading, inclination)
       String[] values = split(data, ",");
-      if (values.length == 5) {
+      if (values.length == 6) {
         float x = float(values[0]);
         float y = float(values[1]);
         float z = float(values[2]);
         float intensity = float(values[3]);
         float heading = float(values[4]);
+        float inclination = float(values[5]);
 
         // Record the data to the file
         output.println(data);
@@ -83,7 +85,7 @@ void serialEvent(Serial myPort) {
         for (int i = 0; i < maxDataPoints - 1; i++) {
           dataPoints[i] = dataPoints[i + 1];
         }
-        dataPoints[maxDataPoints - 1] = new float[]{x, y, z, intensity, heading};
+        dataPoints[maxDataPoints - 1] = new float[]{x, y, z, intensity, heading, inclination};
       }
     } catch (Exception e) {
       println("Invalid data: " + data); // Handle parsing errors
