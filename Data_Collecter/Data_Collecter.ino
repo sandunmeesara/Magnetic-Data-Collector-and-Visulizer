@@ -14,6 +14,7 @@ void calculateMagneticFieldAndHeading(float x, float y, float z, float &intensit
     // Calculate the heading (in degrees)
     heading = atan2(y, x) * 180.0 / PI;
 
+
     // Ensure heading is in the range [0, 360]
     if (heading < 0) {
         heading += 360.0;
@@ -44,12 +45,16 @@ void loop() {
 
     // Variables to store calculated values
     float intensity, heading;
-
+    float horizontalField = sqrt(event.magnetic.x * event.magnetic.x + event.magnetic.y * event.magnetic.y); // Magnitude of horizontal component
+    float inclinationRadians = atan2(event.magnetic.z, horizontalField); // Angle in radians
+    float inclinationDegrees = inclinationRadians * 180.0 / PI; // Convert to degrees
+    
     // Calculate magnetic field intensity and heading
     calculateMagneticFieldAndHeading(event.magnetic.x, event.magnetic.y, event.magnetic.z, intensity, heading);
+    
 
     // Format the data
-    String data1 = String(event.magnetic.x) + "," +  String(event.magnetic.y) + "," +  String(event.magnetic.z) + "," + String(intensity) + "," + String(heading);
+    String data1 = String(event.magnetic.x) + "," +  String(event.magnetic.y) + "," +  String(event.magnetic.z) + "," + String(intensity) + "," + String(heading) + "," + String(inclinationDegrees);
     //String data2 = "Intensity: " + String(intensity) + " uT, Heading: " + String(heading) + " degrees";
 
     // Send data over Bluetooth
