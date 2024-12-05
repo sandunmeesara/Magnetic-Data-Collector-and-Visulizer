@@ -133,7 +133,7 @@ void keyTyped() {
           if (output != null) output.close(); // Close the previous file if open
           String fileName = "data_location_" + locationNumber + ".csv";
           output = createWriter(fileName);
-          output.println("X,Y,Z,Intensity,Heading,Inclination"); // Add header row
+          output.println("M_X,M_Y,M_Z,Intensity,Heading,Inclination"); // Add header row
           println("Started recording data to: " + fileName);
           recording = true; // Start recording
         }
